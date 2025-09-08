@@ -26,6 +26,22 @@ struct Value Calculate(struct Value LeftOperand, struct Value RightOperand, char
         Result.Type = IntegerType;
         Result.ValuePointer = ResultPtr;
     }
+    else if (LeftOperand.Type == StringType && RightOperand.Type == StringType) {
+
+        if (Operator != '+') {
+            return Result;
+        }
+
+        char* LeftValue = (char*) LeftOperand.ValuePointer;
+        char* RightValue = (char*) RightOperand.ValuePointer;
+
+        char* ResultPtr = malloc((strlen(LeftValue) + strlen(RightValue) + 1) * sizeof(char));
+        strcpy(ResultPtr, LeftValue);
+        strcat(ResultPtr, RightValue);
+
+        Result.Type = StringType;
+        Result.ValuePointer = (int*) ResultPtr;
+    }
 
     return Result;
 }

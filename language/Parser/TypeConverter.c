@@ -13,4 +13,9 @@ int* ConvertTokenToType(char* Text, enum TokenTypes TokenType) {
         *ValuePtr = atoi(Text);
         return ValuePtr;
     }
+    else if (TokenType == StringToken) {
+        char* ValuePtr = malloc((strlen(Text) + 1) * sizeof(char));
+        strcpy(ValuePtr, Text);
+        return (int*) ValuePtr;
+    }
 }
