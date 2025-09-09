@@ -53,7 +53,7 @@ int main(void) {
 	printf("----------------------\n");
 
 	double StartParse = GetTime();
-	Parse(AST, ASTNodeCount);
+	Parse(FileChars, AST, ASTNodeCount);
 	double EndParse = GetTime() - StartParse;
 	printf("----------------------\n");
 	printf("AST parsed in: %.4f ms\n", EndParse);

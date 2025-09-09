@@ -4,6 +4,7 @@
 #include "../Headers/ASTNode.h"
 #include "../Headers/Value.h"
 
+#include "../ErrorHandling/ErrorHandler.c"
 struct Value Calculate(struct Value LeftOperand, struct Value RightOperand, char Operator) {
 	
     struct Value Result;

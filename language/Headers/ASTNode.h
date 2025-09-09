@@ -15,7 +15,7 @@ enum ASTNodeType {
 struct ASTNode {
     enum ASTNodeType Type;
     struct ASTNode* ChildNodes;
-    int ChildNodeCount; // Only used for certain Nodes where the amount of children is unknown such as function calls
+    int ChildNodeCount;
     struct Token Token;
 };
 

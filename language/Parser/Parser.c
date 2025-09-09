@@ -9,6 +9,8 @@
 #include "TypeConverter.c"
 #include "FunctionCaller.c"
 
+
+
 struct Variable {
     char* Name;
     struct Value Value;
@@ -22,6 +24,8 @@ struct Value GetVariable(char* Name, struct Variable* Variables, int VariableCou
             return Variables[i].Value;
         }
     }
+
+    Error("Variable not initialized");
 }
 
 struct Variable ParseLine(struct ASTNode AST, struct Variable* Variables, int VariableCount) {
@@ -49,10 +53,24 @@ struct Variable ParseLine(struct ASTNode AST, struct Variable* Variables, int Va
         }
     }
     else if (AST.Type == AssigmentNode) {
+
+        if (AST.ChildNodes[1].Type == EmptyNode) {
+            Error("No value assigned to variable");
+        }
+        else if (AST.ChildNodes[1].Type == AssigmentNode) {
+            Error("Invalid Sytnax");
+        }
+
         Variable.Name = AST.ChildNodes[0].Token.Text;
         Variable.Value = ParseLine(AST.ChildNodes[1], Variables, VariableCount).Value;
     }
     else if (AST.Type == OperatorNode) {
+        if (AST.ChildNodes[0].Type == EmptyNode) {
+            Error("Operator missing left operand");
+        }
+        else if (AST.ChildNodes[1].Type == EmptyNode) {
+            Error("Operator missing right operand");
+        }
         struct Value LeftOperand = ParseLine(AST.ChildNodes[0], Variables, VariableCount).Value;
         struct Value RightOperand = ParseLine(AST.ChildNodes[1], Variables, VariableCount).Value;
 
@@ -71,12 +89,26 @@ struct Variable ParseLine(struct ASTNode AST, struct Variable* Variables, int Va
     return Variable;
 }
 
-void Parse(struct ASTNode* AST, int ASTNodeCount) {
+void Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount) {
 
     struct Variable* Variables = malloc(0);
     int VariableCount = 0;
+
+    int FileCharIndex = 0;
     
     for (int i = 0; i < ASTNodeCount; i++) {
+
+        // This is only used for error reporting
+        GlobalLineNumber = i + 1;
+        
+        while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
+            GlobalLine = realloc(GlobalLine, (FileCharIndex + 1) * sizeof(char));
+            GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
+            FileCharIndex++;
+        }
+        GlobalLine[FileCharIndex] = '\0'; // Terminate the string
+        FileCharIndex++;
+
         struct Variable Variable = ParseLine(AST[i], Variables, VariableCount);
 
         if (Variable.Name != NULL) {
@@ -84,5 +116,9 @@ void Parse(struct ASTNode* AST, int ASTNodeCount) {
             Variables[VariableCount] = Variable;
             VariableCount++;
         }
+
+        // Frees the current line after parsing it
+        free(GlobalLine);
+        GlobalLine = NULL;
     }
 }
