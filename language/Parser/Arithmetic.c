@@ -5,6 +5,7 @@
 #include "../Headers/Value.h"
 
 #include "../ErrorHandling/ErrorHandler.c"
+
 struct Value Calculate(struct Value LeftOperand, struct Value RightOperand, char Operator) {
 	
     struct Value Result;
@@ -29,9 +30,8 @@ struct Value Calculate(struct Value LeftOperand, struct Value RightOperand, char
     }
     else if (LeftOperand.Type == StringType && RightOperand.Type == StringType) {
 
-        if (Operator != '+') {
-            return Result;
-        }
+        // Only + is supported for strings
+        if (Operator != '+') { Error("Invalid operator for strings"); }
 
         char* LeftValue = (char*) LeftOperand.ValuePointer;
         char* RightValue = (char*) RightOperand.ValuePointer;
