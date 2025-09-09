@@ -4,12 +4,11 @@
 #include "../Headers/Token.h"
 #include "../Headers/ASTNode.h"
 #include "../Headers/Value.h"
+#include "../Headers/ErrorHandler.h"
 
 #include "Arithmetic.c"
 #include "TypeConverter.c"
 #include "FunctionCaller.c"
-
-
 
 struct Variable {
     char* Name;
@@ -98,14 +97,15 @@ void Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount) {
     
     for (int i = 0; i < ASTNodeCount; i++) {
 
-        // This is only used for error reporting
+        // This is only used for error handling
         GlobalLineNumber = i + 1;
         
         while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
-            GlobalLine = realloc(GlobalLine, (FileCharIndex + 1) * sizeof(char));
+            GlobalLine = realloc(GlobalLine, (FileCharIndex + 2) * sizeof(char));
             GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
             FileCharIndex++;
         }
+
         GlobalLine[FileCharIndex] = '\0'; // Terminate the string
         FileCharIndex++;
 

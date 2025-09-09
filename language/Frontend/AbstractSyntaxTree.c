@@ -4,6 +4,7 @@
 
 #include "../Headers/Token.h"
 #include "../Headers/ASTNode.h"
+#include "../Headers/ErrorHandler.h"
 
 struct ASTNodeReturnValue {
 	struct ASTNode ASTNode;
@@ -44,6 +45,10 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 		}
 		else if (Token.TokenType == StringToken || Token.TokenType == IntegerToken ||
 			Token.TokenType == VariableToken) {
+				
+			if (ASTNode.Type != EmptyNode) {
+				Error("Syntax Error");
+			}
 
 			ASTNode.Type = LeafNode;
 			ASTNode.Token = Token;
@@ -101,6 +106,11 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 		else if (Token.TokenType == BracketToken) {
 
 			if (Token.Text[0] == '(') {
+
+				if (ASTNode.Type != EmptyNode) {
+					Error("Syntax Error");
+				}
+				
 				struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, CurrentToken + 1);
 				
 				ASTNode = ReturnValue.ASTNode;
@@ -113,6 +123,10 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 			}
 		}
 		else if (Token.TokenType == FunctionToken) {
+
+			if (ASTNode.Type != EmptyNode) {
+				Error("Syntax Error");
+			}
 
 			ASTNode.Type = FunctionNode;
 			ASTNode.Token = Token;
@@ -147,12 +161,26 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 	return CreateReturnValue(ASTNode, CurrentToken, false);
 }
 
-struct ASTNode* CreateAST(struct Token* Tokens, int TokenCount, int* ASTNodeCount) {
+struct ASTNode* CreateAST(char* FileChars, struct Token* Tokens, int TokenCount, int* ASTNodeCount) {
 
 	int CurrentToken = 0;
 	struct ASTNode* AST = malloc(0);
 
+	int FileCharIndex = 0;
+
 	while (CurrentToken < TokenCount) {
+		// This is only used for error handling
+        GlobalLineNumber += 1;
+        
+        while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
+            GlobalLine = realloc(GlobalLine, (FileCharIndex + 2) * sizeof(char));
+            GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
+            FileCharIndex++;
+        }
+        
+        GlobalLine[FileCharIndex] = '\0'; // Terminate the string
+        FileCharIndex++;
+
 		struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, CurrentToken);
 
         AST = realloc(AST, ((*ASTNodeCount) + 1) * sizeof(struct ASTNode));
@@ -160,6 +188,10 @@ struct ASTNode* CreateAST(struct Token* Tokens, int TokenCount, int* ASTNodeCoun
         (*ASTNodeCount)++;
 
         CurrentToken = ReturnValue.CurrentToken + 1;
+
+        // Frees the current line after using it
+        free(GlobalLine);
+        GlobalLine = NULL;
 	}
 
 	return AST;

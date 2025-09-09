@@ -46,7 +46,7 @@ int main(void) {
 	int ASTNodeCount = 0;
 
 	double StartCreateAST = GetTime();
-	struct ASTNode* AST = CreateAST(Tokens->Tokens, Tokens->TokenCount, &ASTNodeCount);
+	struct ASTNode* AST = CreateAST(FileChars, Tokens->Tokens, Tokens->TokenCount, &ASTNodeCount);
 	double EndCreateAST = GetTime() - StartCreateAST;
 	printf("AST created in: %.4f ms\n", EndCreateAST);
 	printf("Code output\n");

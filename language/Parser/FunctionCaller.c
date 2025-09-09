@@ -8,5 +8,7 @@ void CallFunction(char* FunctionName, struct Value* FunctionArgs, int ArgumentCo
     if (strcmp(FunctionName, "print") == 0) {
         print(FunctionArgs[0]);
     }
-
+    else {
+        Error("Function not defined");
+    }
 }
