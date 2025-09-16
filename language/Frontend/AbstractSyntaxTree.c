@@ -43,7 +43,7 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 		if (Token.TokenType == EndOfLineToken) {
 			return CreateReturnValue(ASTNode, CurrentToken, Priority);
 		}
-		else if (Token.TokenType == StringToken || Token.TokenType == IntegerToken ||
+		else if (Token.TokenType == StringToken || Token.TokenType == IntegerToken || Token.TokenType == FloatToken ||
 			Token.TokenType == VariableToken) {
 				
 			if (ASTNode.Type != EmptyNode) {

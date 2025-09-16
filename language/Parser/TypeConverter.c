@@ -13,6 +13,11 @@ int* ConvertTokenToType(char* Text, enum TokenTypes TokenType) {
         *ValuePtr = atoi(Text);
         return ValuePtr;
     }
+    else if  (TokenType == FloatToken) {
+        float* ValuePtr = malloc(sizeof(float));
+        *ValuePtr = atof(Text);
+        return (int*) ValuePtr;
+    }
     else if (TokenType == StringToken) {
         char* ValuePtr = malloc((strlen(Text) + 1) * sizeof(char));
         strcpy(ValuePtr, Text);

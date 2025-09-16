@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include "../Headers/Token.h"
+#include "../Headers/ErrorHandler.h"
 
 // Maximum size of a single token
 #define MaxTokenBufferSize 1024
@@ -48,6 +49,19 @@ struct Tokens* Tokenize(char* FileChars) {
 	struct Token *Tokens = malloc(0);
 	int TokenCount = 0;
 
+	// This is only used for error handling
+	GlobalLineNumber = 1;
+	int FileCharIndex = 0;
+	
+	while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
+		GlobalLine = realloc(GlobalLine, (FileCharIndex + 2) * sizeof(char));
+		GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
+		FileCharIndex++;
+	}
+
+	GlobalLine[FileCharIndex] = '\0'; // Terminate the string
+	FileCharIndex++;
+
 	// Iterates over the characters to turn them into tokens
 	while (FileChars[CharLocation] != 0) {
 
@@ -71,14 +85,31 @@ struct Tokens* Tokenize(char* FileChars) {
 			UpdateTokens(&Tokens, TokenBuffer, &TokenCount, &TokenBufferLocation, TokenType);
 		}
 		else if (IsNumeric(FileChars[CharLocation])) {
+
+			bool HasDecimalPoint = false;
 			
-			while (IsNumeric(FileChars[CharLocation])) {
+			while (IsNumeric(FileChars[CharLocation]) || FileChars[CharLocation] == '.') {
+
+				if (FileChars[CharLocation] == '.') {
+					if (HasDecimalPoint) {
+						Error("Invalid number");
+					}
+					HasDecimalPoint = true;
+				}
+
 				TokenBuffer[TokenBufferLocation] = FileChars[CharLocation];
 				TokenBufferLocation++;
 				CharLocation++;
 			}
 
-			enum TokenTypes TokenType = IntegerToken;
+			enum TokenTypes TokenType;
+
+			if (HasDecimalPoint) {
+				TokenType = FloatToken;
+			}
+			else {
+				TokenType = IntegerToken;
+			}
 			
 			UpdateTokens(&Tokens, TokenBuffer, &TokenCount, &TokenBufferLocation, TokenType);
 
@@ -99,7 +130,27 @@ struct Tokens* Tokenize(char* FileChars) {
 		else if (strchr(";=+-*/()[]{},", FileChars[CharLocation]) != NULL) {
 			enum TokenTypes TokenType;
 			switch (FileChars[CharLocation]) {
-				case ';': TokenType = EndOfLineToken; break;
+				case ';':
+					TokenType = EndOfLineToken;
+
+					// More error handling code
+					// Frees the current line after parsing it
+					free(GlobalLine);
+					GlobalLine = NULL;
+
+					while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
+						GlobalLine = realloc(GlobalLine, (FileCharIndex + 2) * sizeof(char));
+						GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
+						FileCharIndex++;
+					}
+
+					GlobalLine = realloc(GlobalLine, (FileCharIndex + 1) * sizeof(char));
+					GlobalLine[FileCharIndex] = '\0'; // Terminate the string
+					FileCharIndex++;
+					GlobalLineNumber++;
+
+					break;
+					
 				case '=': TokenType = AssignmentToken; break;
 				case '+': TokenType = OperatorToken; break;
 				case '-': TokenType = OperatorToken; break;
@@ -121,6 +172,10 @@ struct Tokens* Tokenize(char* FileChars) {
 			CharLocation++;
 		}
 	}
+
+	// Frees the global line used for error handling
+	free(GlobalLine);
+	GlobalLine = NULL;
 
 	struct Tokens* TokensStruct = malloc(sizeof(struct Tokens));
 	TokensStruct->Tokens = Tokens;

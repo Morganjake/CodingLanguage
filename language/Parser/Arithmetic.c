@@ -28,6 +28,47 @@ struct Value Calculate(struct Value LeftOperand, struct Value RightOperand, char
         Result.Type = IntegerType;
         Result.ValuePointer = ResultPtr;
     }
+    else if (LeftOperand.Type == FloatType && RightOperand.Type == FloatType) {
+        float LeftValue = *(float*) LeftOperand.ValuePointer;
+        float RightValue = *(float*) RightOperand.ValuePointer;
+
+        float* ResultPtr = malloc(sizeof(float));
+
+        switch (Operator) {
+            case '+': *ResultPtr = LeftValue + RightValue; break;
+            case '-': *ResultPtr = LeftValue - RightValue; break;
+            case '*': *ResultPtr = LeftValue * RightValue; break;
+            case '/': *ResultPtr = LeftValue / RightValue; break;
+        }
+
+        Result.Type = FloatType;
+        Result.ValuePointer = (int*) ResultPtr;
+    }
+    else if (LeftOperand.Type == IntegerType && RightOperand.Type == FloatType ||
+        LeftOperand.Type == FloatType && RightOperand.Type == IntegerType) {
+
+        float LeftValue;
+        float RightValue;
+        if (LeftOperand.Type == IntegerType && RightOperand.Type == FloatType) {
+            LeftValue = (float) *LeftOperand.ValuePointer;
+            RightValue = *(float*) RightOperand.ValuePointer;
+        }
+        else {
+            LeftValue = *(float*) LeftOperand.ValuePointer;
+            RightValue = (float) *RightOperand.ValuePointer;
+        }
+        float* ResultPtr = malloc(sizeof(float));
+
+        switch (Operator) {
+            case '+': *ResultPtr = LeftValue + RightValue; break;
+            case '-': *ResultPtr = LeftValue - RightValue; break;
+            case '*': *ResultPtr = LeftValue * RightValue; break;
+            case '/': *ResultPtr = LeftValue / RightValue; break;
+        }
+
+        Result.Type = FloatType;
+        Result.ValuePointer = (int*) ResultPtr;
+    }
     else if (LeftOperand.Type == StringType && RightOperand.Type == StringType) {
 
         // Only + is supported for strings
