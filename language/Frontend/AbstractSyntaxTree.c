@@ -167,6 +167,7 @@ struct ASTNode* CreateAST(char* FileChars, struct Token* Tokens, int TokenCount,
 	struct ASTNode* AST = malloc(0);
 
 	int FileCharIndex = 0;
+	GlobalLineNumber = 0;
 
 	while (CurrentToken < TokenCount) {
 		// This is only used for error handling

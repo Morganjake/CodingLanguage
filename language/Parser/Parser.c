@@ -94,6 +94,7 @@ void Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount) {
     int VariableCount = 0;
 
     int FileCharIndex = 0;
+    GlobalLineNumber = 0;
     
     for (int i = 0; i < ASTNodeCount; i++) {
 
