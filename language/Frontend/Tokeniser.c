@@ -75,11 +75,16 @@ struct Tokens* Tokenize(char* FileChars) {
 
 			enum TokenTypes TokenType;
 			
-			if (FileChars[CharLocation] == '(') {
-				TokenType = FunctionToken;
+			if (strcmp(TokenBuffer, "True") == 0 || strcmp(TokenBuffer, "False") == 0 ) {
+				TokenType = BooleanToken;
 			}
 			else {
-				TokenType = VariableToken;
+				if (FileChars[CharLocation] == '(') {
+					TokenType = FunctionToken;
+				}
+				else {
+					TokenType = VariableToken;
+				}
 			}
 
 			UpdateTokens(&Tokens, TokenBuffer, &TokenCount, &TokenBufferLocation, TokenType);

@@ -12,6 +12,14 @@ struct Value Calculate(struct Value LeftOperand, struct Value RightOperand, char
     Result.Type = NullType;
     Result.ValuePointer = NULL;
 
+    // The value of a boolean is either 0 or 1 so for arithmetic they can be treated as an integer
+    if (LeftOperand.Type == BooleanType) {
+        LeftOperand.Type = IntegerType;
+    }
+    if (RightOperand.Type == BooleanType) {
+        RightOperand.Type = IntegerType;
+    }
+
     if (LeftOperand.Type == IntegerType && RightOperand.Type == IntegerType) {
         int LeftValue = *LeftOperand.ValuePointer;
         int RightValue = *RightOperand.ValuePointer;

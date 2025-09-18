@@ -23,4 +23,14 @@ int* ConvertTokenToType(char* Text, enum TokenTypes TokenType) {
         strcpy(ValuePtr, Text);
         return (int*) ValuePtr;
     }
+    else if (TokenType == BooleanToken) {
+        int* ValuePtr = malloc(sizeof(int));
+        if (strcmp(Text, "True") == 0) {
+            *ValuePtr = 1;
+        }
+        else {
+            *ValuePtr = 0;
+        }
+        return ValuePtr;
+    }
 }
