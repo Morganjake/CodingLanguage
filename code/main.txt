@@ -1,1 +1,0 @@
-print((True + 5) * (True + True));
