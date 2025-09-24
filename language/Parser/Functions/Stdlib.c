@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "../../Headers/Value.h"
+#include "../../Headers/ErrorHandler.h"
 
 int print(struct Value Value) {
 
@@ -20,6 +21,12 @@ int print(struct Value Value) {
         else {
             printf("False\n");
         }
+    }
+    else if (Value.Type == NullType) {
+        printf("\n");
+    }
+    else {
+        Error("Invalid argument to print");
     }
 
     return 0;

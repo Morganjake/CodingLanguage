@@ -73,7 +73,12 @@ struct Variable ParseLine(struct ASTNode AST, struct Variable* Variables, int Va
         struct Value LeftOperand = ParseLine(AST.ChildNodes[0], Variables, VariableCount).Value;
         struct Value RightOperand = ParseLine(AST.ChildNodes[1], Variables, VariableCount).Value;
 
-        Variable.Value = Calculate(LeftOperand, RightOperand, AST.Token.Text[0]);
+        if (AST.FunctionType == MathematicalOperator) {
+            Variable.Value = CalculateMath(LeftOperand, RightOperand, AST.Token.Text);
+        }
+        else if (AST.FunctionType == LogicalOperator) {
+            Variable.Value = CalculateLogic(LeftOperand, RightOperand, AST.Token.Text);
+        }
     }
     else if (AST.Type == FunctionNode) {
         struct Value* FunctionArgs = malloc(AST.ChildNodeCount * sizeof(struct Value));

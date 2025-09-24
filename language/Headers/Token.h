@@ -12,7 +12,9 @@ enum TokenTypes {
 	EndOfLineToken,
 	VariableToken,
 	AssignmentToken,
-	OperatorToken,
+	MathematicalOperatorToken,
+	LogicalOperatorToken,
+	BooleanOperatorToken,
 	BracketToken,
 	FunctionToken,
 	CommaToken

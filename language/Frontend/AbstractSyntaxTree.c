@@ -33,6 +33,7 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 	ASTNode.ChildNodes = malloc(0);
 	ASTNode.ChildNodeCount = 0;
 	ASTNode.Type = EmptyNode;
+	ASTNode.FunctionType = None;
 
 	bool Priority = false;
 
@@ -76,22 +77,50 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 		// Creates a new node and assigns the current ASTNode to one of its child nodes. It then checks
 		// to see whether the returned node is an operator node and if its operator should take
 		// precedence over the new nodes operator
-		else if (Token.TokenType == OperatorToken) {
+		else if (Token.TokenType == MathematicalOperatorToken) {
 
 			struct ASTNode OperatorASTNode;
 			OperatorASTNode.Type = OperatorNode;
+			OperatorASTNode.FunctionType = MathematicalOperator;
 
 			OperatorASTNode.ChildNodes = malloc(2 * sizeof(struct ASTNode));
 			OperatorASTNode.ChildNodes[0] = ASTNode;
 			OperatorASTNode.Token = Token;
 
 			struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, CurrentToken + 1);
-			
+			// Current AST node takes less precedence
 			if (ReturnValue.ASTNode.Type == OperatorNode && !ReturnValue.Priority &&
-				GetCalculatePriority(Token.Text[0], ReturnValue.ASTNode.Token.Text[0])) {
+				(GetCalculatePriority(Token.Text[0], ReturnValue.ASTNode.Token.Text[0]) ||
+				ReturnValue.ASTNode.FunctionType == LogicalOperator)) {
 				
 				// Sets the second child to the first child of the return value's ASTNode then sets
 				// itself and the first child of the return value's ASTNode
+				OperatorASTNode.ChildNodes[1] = ReturnValue.ASTNode.ChildNodes[0];
+				ReturnValue.ASTNode.ChildNodes[0] = OperatorASTNode;
+				ASTNode = ReturnValue.ASTNode;
+			}
+			else {
+				OperatorASTNode.ChildNodes[1] = ReturnValue.ASTNode;
+				ASTNode = OperatorASTNode;
+			}
+
+			CurrentToken = ReturnValue.CurrentToken;
+		}
+		else if (Token.TokenType == LogicalOperatorToken) {
+
+			struct ASTNode OperatorASTNode;
+			OperatorASTNode.Type = OperatorNode;
+			OperatorASTNode.FunctionType = LogicalOperator;
+
+			OperatorASTNode.ChildNodes = malloc(2 * sizeof(struct ASTNode));
+			OperatorASTNode.ChildNodes[0] = ASTNode;
+			OperatorASTNode.Token = Token;
+
+			struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, CurrentToken + 1);
+
+			if (ReturnValue.ASTNode.Type == OperatorNode && !ReturnValue.Priority &&
+				ReturnValue.ASTNode.FunctionType == LogicalOperator) {
+
 				OperatorASTNode.ChildNodes[1] = ReturnValue.ASTNode.ChildNodes[0];
 				ReturnValue.ASTNode.ChildNodes[0] = OperatorASTNode;
 				ASTNode = ReturnValue.ASTNode;

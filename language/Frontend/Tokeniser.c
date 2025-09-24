@@ -132,11 +132,12 @@ struct Tokens* Tokenize(char* FileChars) {
 			UpdateTokens(&Tokens, TokenBuffer, &TokenCount, &TokenBufferLocation, TokenType);
 			CharLocation++;
 		}
-		else if (strchr(";=+-*/()[]{},", FileChars[CharLocation]) != NULL) {
+		else if (strchr(";=+-*/<>()[]{},", FileChars[CharLocation]) != NULL) {
 			enum TokenTypes TokenType;
 			switch (FileChars[CharLocation]) {
 				case ';':
 					TokenType = EndOfLineToken;
+					TokenBuffer[0] = FileChars[CharLocation];
 
 					// More error handling code
 					// Frees the current line after parsing it
@@ -156,20 +157,47 @@ struct Tokens* Tokenize(char* FileChars) {
 
 					break;
 					
-				case '=': TokenType = AssignmentToken; break;
-				case '+': TokenType = OperatorToken; break;
-				case '-': TokenType = OperatorToken; break;
-				case '*': TokenType = OperatorToken; break;
-				case '/': TokenType = OperatorToken; break;
-				case '(': TokenType = BracketToken; break;
-				case ')': TokenType = BracketToken; break;
-				case '[': TokenType = BracketToken; break;
-				case ']': TokenType = BracketToken; break;
-				case '{': TokenType = BracketToken; break;
-				case '}': TokenType = BracketToken; break;
-				case ',': TokenType = CommaToken; break;
+				case '=':
+					if (FileChars[CharLocation + 1] == '=') {
+						TokenBuffer[0] = FileChars[CharLocation];
+						TokenBuffer[1] = FileChars[CharLocation + 1];
+						TokenType = LogicalOperatorToken;
+						CharLocation++;
+					}
+					else {
+						TokenType = AssignmentToken;
+						TokenBuffer[0] = FileChars[CharLocation];
+					}
+					break;
+				case '+': TokenType = MathematicalOperatorToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case '-': TokenType = MathematicalOperatorToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case '*': TokenType = MathematicalOperatorToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case '/': TokenType = MathematicalOperatorToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case '<':
+					TokenBuffer[0] = FileChars[CharLocation];
+					if (FileChars[CharLocation + 1] == '=') {
+						TokenBuffer[1] = FileChars[CharLocation + 1];
+						CharLocation++;
+					}
+					TokenType = LogicalOperatorToken;
+					break;
+				case '>':
+					TokenBuffer[0] = FileChars[CharLocation];
+					if (FileChars[CharLocation + 1] == '=') {
+						TokenBuffer[1] = FileChars[CharLocation + 1];
+						CharLocation++;
+					}
+					TokenType = LogicalOperatorToken;
+					break;
+				case '(': TokenType = BracketToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case ')': TokenType = BracketToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case '[': TokenType = BracketToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case ']': TokenType = BracketToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case '{': TokenType = BracketToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case '}': TokenType = BracketToken; TokenBuffer[0] = FileChars[CharLocation]; break;
+				case ',': TokenType = CommaToken;TokenBuffer[0] = FileChars[CharLocation];  break;
 			}
-			TokenBuffer[0] = FileChars[CharLocation];
+			
 			UpdateTokens(&Tokens, TokenBuffer, &TokenCount, &TokenBufferLocation, TokenType);
 			CharLocation++;
 		}

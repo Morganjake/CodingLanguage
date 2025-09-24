@@ -14,7 +14,7 @@ const char* TokenName(int TokenEnum) {
 		case EndOfLineToken: return "EndOfLine";
 		case VariableToken: return "Variable";
 		case AssignmentToken: return "Assignment";
-		case OperatorToken: return "Operator";
+		case MathematicalOperatorToken: return "Mathematical Operator";
 		case FunctionToken: return "Function";
 		case BracketToken: return "Bracket";
 	}
