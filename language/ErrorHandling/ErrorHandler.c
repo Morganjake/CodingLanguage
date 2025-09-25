@@ -15,7 +15,7 @@ void Error(char* ErrorMessage) {
     printf("Line %d: ", GlobalLineNumber, GlobalLine);
 
     int GlobalLineIndex = 0;
-    while (GlobalLine[GlobalLineIndex] != '\0' && GlobalLine[GlobalLineIndex] != '\n') {
+    while (GlobalLine[GlobalLineIndex] > 32) {
         printf("%c", GlobalLine[GlobalLineIndex]);
         GlobalLineIndex++;
     }   

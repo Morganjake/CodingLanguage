@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <Windows.h>
 
 #include "Headers/Token.h"
 #include "Headers/ASTNode.h"
 
-#include "Frontend/FileReader.c"
 #include "Frontend/Tokeniser.c"
 #include "Frontend/AbstractSyntaxTree.c"
 #include "Parser/Parser.c"
@@ -24,6 +25,28 @@ double GetTime() {
     return (double) Counter.QuadPart * 1000.0 / (double)Frequency.QuadPart;
 }
 
+// Maximum length of a single line
+#define MaxLineBufferSize 1024
+
+void Run(char* LineChars) {
+
+	double StartTokenize = GetTime();
+	struct Tokens* Tokens = Tokenize(LineChars);
+	double EndTokenize = GetTime() - StartTokenize;
+	
+	int ASTNodeCount = 0;
+
+	double StartCreateAST = GetTime();
+	struct ASTNode* AST = CreateAST(Tokens->Tokens, Tokens->TokenCount, &ASTNodeCount);
+	double EndCreateAST = GetTime() - StartCreateAST;
+
+	double StartParse = GetTime();
+	Parse(LineChars, AST, ASTNodeCount);
+	double EndParse = GetTime() - StartParse;
+
+	ObserveAST(AST, ASTNodeCount);
+}
+
 int main(void) {
 	
 	FILE *File = fopen("../code/main.txt", "r");
@@ -33,34 +56,46 @@ int main(void) {
 		return 0;
 	}
 
-	double StartBufferiseFile = GetTime();
-	char* FileChars = BufferiseFile(File);
-	double EndBufferiseFile = GetTime() - StartBufferiseFile;
-	printf("Bufferised file in: %.4f ms\n", EndBufferiseFile);
+	double StartProgramTime = GetTime();
 
-	double StartTokenize = GetTime();
-	struct Tokens* Tokens = Tokenize(FileChars);
-	double EndTokenize = GetTime() - StartTokenize;
-	printf("Tokenized text buffer in: %.4f ms\n", EndTokenize);
+	GlobalLineNumber = 1;
+
+	char LineBuffer[MaxLineBufferSize];
 	
-	int ASTNodeCount = 0;
+	int BufferLocation = 0;
 
-	double StartCreateAST = GetTime();
-	struct ASTNode* AST = CreateAST(FileChars, Tokens->Tokens, Tokens->TokenCount, &ASTNodeCount);
-	double EndCreateAST = GetTime() - StartCreateAST;
-	printf("AST created in: %.4f ms\n", EndCreateAST);
-	printf("Code output\n");
-	printf("----------------------\n");
+	// Iterates over the lines and adds it to a single array
+	while(fgets(LineBuffer, MaxLineBufferSize, File)) {
 
-	double StartParse = GetTime();
-	Parse(FileChars, AST, ASTNodeCount);
-	double EndParse = GetTime() - StartParse;
-	printf("----------------------\n");
-	printf("AST parsed in: %.4f ms\n", EndParse);
-	
-	printf("Code ran in %.4f ms\n", EndBufferiseFile + EndTokenize + EndCreateAST + EndParse);
+		char* FileChars = malloc(0);
+		GlobalLine = malloc(0);
 
-	ObserveAST(AST, ASTNodeCount);
+		for (int i = 0; i < MaxLineBufferSize; i++) {
+			FileChars = realloc(FileChars, (BufferLocation + 1) * sizeof(char));
+			FileChars[BufferLocation] = LineBuffer[i];
+
+			GlobalLine = realloc(GlobalLine, (BufferLocation + 1) * sizeof(char));
+			GlobalLine[BufferLocation] = LineBuffer[i];
+
+			BufferLocation++;
+
+			if (LineBuffer[i] == 59) {
+				Run(FileChars);
+				free(FileChars);
+				free(GlobalLine);
+				BufferLocation = 0;
+				GlobalLineNumber++;
+				break;
+			}
+			
+			if (LineBuffer[i] == 10 || LineBuffer[i] == 0) {
+				break;
+			}
+		}
+	}
+
+	printf("Program ran in: %.4f ms\n", GetTime() - StartProgramTime);
+	fclose(File);
 
 	return 0;
 }

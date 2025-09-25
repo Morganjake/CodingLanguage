@@ -97,23 +97,8 @@ void Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount) {
 
     struct Variable* Variables = malloc(0);
     int VariableCount = 0;
-
-    int FileCharIndex = 0;
-    GlobalLineNumber = 0;
     
     for (int i = 0; i < ASTNodeCount; i++) {
-
-        // This is only used for error handling
-        GlobalLineNumber = i + 1;
-        
-        while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
-            GlobalLine = realloc(GlobalLine, (FileCharIndex + 2) * sizeof(char));
-            GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
-            FileCharIndex++;
-        }
-
-        GlobalLine[FileCharIndex] = '\0'; // Terminate the string
-        FileCharIndex++;
 
         struct Variable Variable = ParseLine(AST[i], Variables, VariableCount);
 
@@ -122,9 +107,5 @@ void Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount) {
             Variables[VariableCount] = Variable;
             VariableCount++;
         }
-
-        // Frees the current line after parsing it
-        free(GlobalLine);
-        GlobalLine = NULL;
     }
 }

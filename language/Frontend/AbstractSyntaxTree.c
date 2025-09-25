@@ -190,26 +190,12 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 	return CreateReturnValue(ASTNode, CurrentToken, false);
 }
 
-struct ASTNode* CreateAST(char* FileChars, struct Token* Tokens, int TokenCount, int* ASTNodeCount) {
+struct ASTNode* CreateAST(struct Token* Tokens, int TokenCount, int* ASTNodeCount) {
 
 	int CurrentToken = 0;
 	struct ASTNode* AST = malloc(0);
 
-	int FileCharIndex = 0;
-	GlobalLineNumber = 0;
-
 	while (CurrentToken < TokenCount) {
-		// This is only used for error handling
-        GlobalLineNumber += 1;
-        
-        while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
-            GlobalLine = realloc(GlobalLine, (FileCharIndex + 2) * sizeof(char));
-            GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
-            FileCharIndex++;
-        }
-        
-        GlobalLine[FileCharIndex] = '\0'; // Terminate the string
-        FileCharIndex++;
 
 		struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, CurrentToken);
 
@@ -218,10 +204,6 @@ struct ASTNode* CreateAST(char* FileChars, struct Token* Tokens, int TokenCount,
         (*ASTNodeCount)++;
 
         CurrentToken = ReturnValue.CurrentToken + 1;
-
-        // Frees the current line after using it
-        free(GlobalLine);
-        GlobalLine = NULL;
 	}
 
 	return AST;

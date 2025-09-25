@@ -49,19 +49,6 @@ struct Tokens* Tokenize(char* FileChars) {
 	struct Token *Tokens = malloc(0);
 	int TokenCount = 0;
 
-	// This is only used for error handling
-	GlobalLineNumber = 1;
-	int FileCharIndex = 0;
-	
-	while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
-		GlobalLine = realloc(GlobalLine, (FileCharIndex + 2) * sizeof(char));
-		GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
-		FileCharIndex++;
-	}
-
-	GlobalLine[FileCharIndex] = '\0'; // Terminate the string
-	FileCharIndex++;
-
 	// Iterates over the characters to turn them into tokens
 	while (FileChars[CharLocation] != 0) {
 
@@ -136,26 +123,7 @@ struct Tokens* Tokenize(char* FileChars) {
 			enum TokenTypes TokenType;
 			switch (FileChars[CharLocation]) {
 				case ';':
-					TokenType = EndOfLineToken;
-					TokenBuffer[0] = FileChars[CharLocation];
-
-					// More error handling code
-					// Frees the current line after parsing it
-					free(GlobalLine);
-					GlobalLine = NULL;
-
-					while (FileChars[FileCharIndex] != ';' && FileChars[FileCharIndex] != '\0') {
-						GlobalLine = realloc(GlobalLine, (FileCharIndex + 2) * sizeof(char));
-						GlobalLine[FileCharIndex] = FileChars[FileCharIndex];
-						FileCharIndex++;
-					}
-
-					GlobalLine = realloc(GlobalLine, (FileCharIndex + 1) * sizeof(char));
-					GlobalLine[FileCharIndex] = '\0'; // Terminate the string
-					FileCharIndex++;
-					GlobalLineNumber++;
-
-					break;
+					TokenType = EndOfLineToken; TokenBuffer[0] = FileChars[CharLocation]; break;
 					
 				case '=':
 					if (FileChars[CharLocation + 1] == '=') {
@@ -205,10 +173,6 @@ struct Tokens* Tokenize(char* FileChars) {
 			CharLocation++;
 		}
 	}
-
-	// Frees the global line used for error handling
-	free(GlobalLine);
-	GlobalLine = NULL;
 
 	struct Tokens* TokensStruct = malloc(sizeof(struct Tokens));
 	TokensStruct->Tokens = Tokens;
