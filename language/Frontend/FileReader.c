@@ -11,18 +11,7 @@ char* BufferiseFile(FILE* File) {
 	int FileBufferSize = 0;
 	char LineBuffer[MaxLineBufferSize];
 
-	// Iterates over the lines to get the size of the buffer
-	while(fgets(LineBuffer, MaxLineBufferSize, *(&File))) {
-		FileBufferSize += strlen(LineBuffer);
-	}
-
-	char *FileChars = calloc(FileBufferSize + 1, sizeof(char));
-	
-	for (int i = 0; i < FileBufferSize; i++) {
-		FileChars[i] = ' ';
-	}
-
-	rewind(File);
+	char* FileChars = malloc(0);
 
 	int BufferLocation = 0;
 
@@ -30,6 +19,7 @@ char* BufferiseFile(FILE* File) {
 	while(fgets(LineBuffer, MaxLineBufferSize, File)) {
 
 		for (int i = 0; i < MaxLineBufferSize; i++) {
+			FileChars = realloc(FileChars, (BufferLocation + 1) * sizeof(char));
 			FileChars[BufferLocation] = LineBuffer[i];
 			BufferLocation++;
 			
