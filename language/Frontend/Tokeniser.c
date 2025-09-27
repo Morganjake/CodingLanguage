@@ -50,7 +50,7 @@ struct Tokens* Tokenize(char* FileChars) {
 	int TokenCount = 0;
 
 	// Iterates over the characters to turn them into tokens
-	while (FileChars[CharLocation] != 0) {
+	while (FileChars[CharLocation] > 32) {
 
 		if (IsAlphabetic(FileChars[CharLocation])) {
 

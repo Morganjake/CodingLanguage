@@ -28,7 +28,7 @@ double GetTime() {
 // Maximum length of a single line
 #define MaxLineBufferSize 1024
 
-void Run(char* LineChars) {
+void Interpret(char* LineChars) {
 
 	double StartTokenize = GetTime();
 	struct Tokens* Tokens = Tokenize(LineChars);
@@ -71,6 +71,7 @@ int main(void) {
 		GlobalLine = malloc(0);
 
 		for (int i = 0; i < MaxLineBufferSize; i++) {
+			
 			FileChars = realloc(FileChars, (BufferLocation + 1) * sizeof(char));
 			FileChars[BufferLocation] = LineBuffer[i];
 
@@ -80,7 +81,7 @@ int main(void) {
 			BufferLocation++;
 
 			if (LineBuffer[i] == 59) {
-				Run(FileChars);
+				Interpret(FileChars);
 				free(FileChars);
 				free(GlobalLine);
 				BufferLocation = 0;
