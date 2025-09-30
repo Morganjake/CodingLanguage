@@ -6,7 +6,7 @@
 #include "Headers/Token.h"
 #include "Headers/ASTNode.h"
 
-#include "Frontend/Tokeniser.c"
+#include "Frontend/Tokenizer.c"
 #include "Frontend/AbstractSyntaxTree.c"
 #include "Parser/Parser.c"
 #include "../debugging/CodeViewer.c"
@@ -28,7 +28,7 @@ double GetTime() {
 // Maximum length of a single line
 #define MaxLineBufferSize 1024
 
-void Interpret(char* LineChars) {
+void Interpret(char* LineChars, struct Variable** Variables, int* VariableCount) {
 
 	double StartTokenize = GetTime();
 	struct Tokens* Tokens = Tokenize(LineChars);
@@ -40,11 +40,11 @@ void Interpret(char* LineChars) {
 	struct ASTNode* AST = CreateAST(Tokens->Tokens, Tokens->TokenCount, &ASTNodeCount);
 	double EndCreateAST = GetTime() - StartCreateAST;
 
-	double StartParse = GetTime();
-	Parse(LineChars, AST, ASTNodeCount);
-	double EndParse = GetTime() - StartParse;
-
 	ObserveAST(AST, ASTNodeCount);
+
+	double StartParse = GetTime();
+	Parse(LineChars, AST, ASTNodeCount, Variables, VariableCount);
+	double EndParse = GetTime() - StartParse;
 }
 
 int main(void) {
@@ -61,8 +61,10 @@ int main(void) {
 	GlobalLineNumber = 1;
 
 	char LineBuffer[MaxLineBufferSize];
-	
 	int BufferLocation = 0;
+
+    struct Variable* Variables = malloc(0);
+    int VariableCount = 0;
 
 	// Iterates over the lines and adds it to a single array
 	while(fgets(LineBuffer, MaxLineBufferSize, File)) {
@@ -81,7 +83,7 @@ int main(void) {
 			BufferLocation++;
 
 			if (LineBuffer[i] == 59) {
-				Interpret(FileChars);
+				Interpret(FileChars, &Variables, &VariableCount);
 				free(FileChars);
 				free(GlobalLine);
 				BufferLocation = 0;

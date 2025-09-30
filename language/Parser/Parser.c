@@ -16,18 +16,19 @@ struct Variable {
 };
 
 // Gets a variable from the variable list
-struct Value GetVariable(char* Name, struct Variable* Variables, int VariableCount) {
-    
-    for (int i = 0; i < VariableCount; i++) {
-        if (strcmp(Name, Variables[i].Name) == 0) {
-            return Variables[i].Value;
+struct Value GetVariable(char* Name, struct Variable** Variables, int* VariableCount) {
+
+    for (int i = 0; i < *VariableCount; i++) {
+        if (strcmp(Name, (*Variables)[i].Name) == 0) {
+            return (*Variables)[i].Value;
         }
     }
 
     Error("Variable not initialized");
 }
 
-struct Variable ParseLine(struct ASTNode AST, struct Variable* Variables, int VariableCount) {
+struct Variable ParseLine(struct ASTNode AST, struct Variable** Variables, int* VariableCount) {
+
 
     // Creates a Null variable containing a Null value
     struct Value Value;
@@ -93,19 +94,17 @@ struct Variable ParseLine(struct ASTNode AST, struct Variable* Variables, int Va
     return Variable;
 }
 
-void Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount) {
+void Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount,
+    struct Variable** Variables, int* VariableCount) {
 
-    struct Variable* Variables = malloc(0);
-    int VariableCount = 0;
-    
     for (int i = 0; i < ASTNodeCount; i++) {
 
         struct Variable Variable = ParseLine(AST[i], Variables, VariableCount);
 
         if (Variable.Name != NULL) {
-            Variables = realloc(Variables, (VariableCount + 1) * sizeof(struct Variable));
-            Variables[VariableCount] = Variable;
-            VariableCount++;
+            *Variables = realloc(*Variables, ((*VariableCount) + 1) * sizeof(struct Variable));
+            (*Variables)[*VariableCount] = Variable;
+            *VariableCount += 1;
         }
     }
 }
