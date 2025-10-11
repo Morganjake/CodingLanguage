@@ -41,8 +41,8 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 		
 		struct Token Token = Tokens[CurrentToken];
 
+
 		if (Token.TokenType == EndOfLineToken) {
-			return CreateReturnValue(ASTNode, CurrentToken, Priority);
 			return CreateReturnValue(ASTNode, CurrentToken + 1, Priority);
 		}
 		else if (Token.TokenType == IntegerToken || Token.TokenType == FloatToken || Token.TokenType == StringToken || 
@@ -133,6 +133,17 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 
 			CurrentToken = ReturnValue.CurrentToken;
 		}
+		else if (Token.TokenType == SelectionToken) {
+
+			ASTNode.Type = SelectionNode;
+			ASTNode.Token = Token;
+
+			struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, CurrentToken + 1);
+			ASTNode.ChildNodes = malloc(1 * sizeof(struct ASTNode));
+			ASTNode.ChildNodes[0] = ReturnValue.ASTNode;
+			
+			CurrentToken = ReturnValue.CurrentToken;
+		}
 		else if (Token.TokenType == BracketToken) {
 
 			if (Token.Text[0] == '(') {
@@ -150,6 +161,10 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 			else if (Token.Text[0] == ')') {
 				// We return CurrentToken + 1 so that it skips the ')' when we return 
 				return CreateReturnValue(ASTNode, CurrentToken + 1, Priority);
+			}
+			else if (Token.Text[0] == '{') {
+				// We ignore '{' as it is just used to denote the start of a block and will always be the last token
+				CurrentToken++;
 			}
 		}
 		else if (Token.TokenType == FunctionToken) {

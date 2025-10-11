@@ -9,6 +9,7 @@ enum ASTNodeType {
     LeafNode,
     AssigmentNode,
     OperatorNode,
+    SelectionNode,
     FunctionNode
 };
 

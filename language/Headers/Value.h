@@ -7,7 +7,10 @@ enum DataType {
     IntegerType,
     FloatType,
     StringType,
-    BooleanType
+    BooleanType,
+
+    // Not a data type, but used to return an evaluated statement
+    ConditionType
 };
 
 struct Value {

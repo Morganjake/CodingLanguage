@@ -81,6 +81,21 @@ struct Variable ParseLine(struct ASTNode AST, struct Variable** Variables, int* 
             Variable.Value = CalculateLogic(LeftOperand, RightOperand, AST.Token.Text);
         }
     }
+    else if (AST.Type == SelectionNode) {
+        if (AST.ChildNodes[0].Type == EmptyNode) {
+            Error("Selection missing condition");
+        }
+
+        struct Value Condition = ParseLine(AST.ChildNodes[0], Variables, VariableCount).Value;
+
+        if (Condition.Type != BooleanType) {
+            Error("Selection condition must be a boolean");
+        }
+
+        Variable.Value = Condition;
+        Variable.Value.Type = ConditionType;
+
+    }
     else if (AST.Type == FunctionNode) {
         struct Value* FunctionArgs = malloc(AST.ChildNodeCount * sizeof(struct Value));
 
@@ -94,17 +109,16 @@ struct Variable ParseLine(struct ASTNode AST, struct Variable** Variables, int* 
     return Variable;
 }
 
-void Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount,
+struct Value Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount,
     struct Variable** Variables, int* VariableCount) {
 
-    for (int i = 0; i < ASTNodeCount; i++) {
+    struct Variable Variable = ParseLine(AST[0], Variables, VariableCount);
 
-        struct Variable Variable = ParseLine(AST[i], Variables, VariableCount);
-
-        if (Variable.Name != NULL) {
-            *Variables = realloc(*Variables, ((*VariableCount) + 1) * sizeof(struct Variable));
-            (*Variables)[*VariableCount] = Variable;
-            *VariableCount += 1;
-        }
+    if (Variable.Name != NULL) {
+        *Variables = realloc(*Variables, ((*VariableCount) + 1) * sizeof(struct Variable));
+        (*Variables)[*VariableCount] = Variable;
+        *VariableCount += 1;
     }
+
+    return Variable.Value;
 }

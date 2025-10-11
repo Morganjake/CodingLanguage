@@ -65,6 +65,9 @@ struct Tokens* Tokenize(char* FileChars) {
 			if (strcmp(TokenBuffer, "True") == 0 || strcmp(TokenBuffer, "False") == 0 ) {
 				TokenType = BooleanToken;
 			}
+			else if (strcmp(TokenBuffer, "if") == 0) {
+				TokenType = SelectionToken;
+			}
 			else {
 				if (FileChars[CharLocation] == '(') {
 					TokenType = FunctionToken;

@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <Windows.h>
 
 #include "Headers/Token.h"
 #include "Headers/ASTNode.h"
+#include "Headers/Value.h"
 
 #include "Frontend/Tokenizer.c"
 #include "Frontend/AbstractSyntaxTree.c"
@@ -28,23 +30,17 @@ double GetTime() {
 // Maximum length of a single line
 #define MaxLineBufferSize 1024
 
-void Interpret(char* LineChars, struct Variable** Variables, int* VariableCount) {
+struct Value RunLine(char* LineChars, struct Variable** Variables, int* VariableCount) {
 
-	double StartTokenize = GetTime();
 	struct Tokens* Tokens = Tokenize(LineChars);
-	double EndTokenize = GetTime() - StartTokenize;
 	
 	int ASTNodeCount = 0;
-
-	double StartCreateAST = GetTime();
+	
 	struct ASTNode* AST = CreateAST(Tokens->Tokens, Tokens->TokenCount, &ASTNodeCount);
-	double EndCreateAST = GetTime() - StartCreateAST;
-
+	
 	ObserveAST(AST, ASTNodeCount);
 
-	double StartParse = GetTime();
-	Parse(LineChars, AST, ASTNodeCount, Variables, VariableCount);
-	double EndParse = GetTime() - StartParse;
+	return Parse(LineChars, AST, ASTNodeCount, Variables, VariableCount);
 }
 
 int main(void) {
@@ -82,12 +78,36 @@ int main(void) {
 
 			BufferLocation++;
 
-			if (LineBuffer[i] == 59) {
-				Interpret(FileChars, &Variables, &VariableCount);
+			if (LineBuffer[i] == 59 || LineBuffer[i] == 123) {
+				struct Value Value = RunLine(FileChars, &Variables, &VariableCount);
 				free(FileChars);
 				free(GlobalLine);
 				BufferLocation = 0;
 				GlobalLineNumber++;
+
+				if (Value.Type == ConditionType && *Value.ValuePointer == 0) {
+					// Skips to the end of the block
+					int OpenBrackets = 1;
+					while (OpenBrackets > 0) {
+						fgets(LineBuffer, MaxLineBufferSize, File);
+						GlobalLineNumber++;
+
+						for (int i = 0; i < MaxLineBufferSize; i++) {
+
+							if (LineBuffer[i] == 123) {
+								OpenBrackets++;
+							}
+							else if (LineBuffer[i] == 125) {
+								OpenBrackets--;
+							}
+
+							if (LineBuffer[i] == 10 || LineBuffer[i] == 0) {
+								break;
+							}
+						}
+					}
+				}
+
 				break;
 			}
 			

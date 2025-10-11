@@ -6,11 +6,11 @@
 const char* TokenName(int TokenEnum) {
 	
 	switch (TokenEnum) {
-		case KeywordToken: return "Keyword";
 		case StringToken: return "String";
 		case IntegerToken: return "Integer";
 		case FloatToken: return "Float";
 		case BooleanToken: return "Boolean";
+		case SelectionToken: return "Selection";
 		case EndOfLineToken: return "EndOfLine";
 		case VariableToken: return "Variable";
 		case AssignmentToken: return "Assignment";
@@ -18,7 +18,6 @@ const char* TokenName(int TokenEnum) {
 		case FunctionToken: return "Function";
 		case BracketToken: return "Bracket";
 	}
-	
 }
 
 void PrintSpaces(int SpaceCount) {
@@ -46,6 +45,11 @@ void InnerObserveAST(struct ASTNode ASTNode, int SpaceCount) {
 		InnerObserveAST(ASTNode.ChildNodes[0], SpaceCount + 2);
 		PrintSpaces(SpaceCount + 2); printf("Operator: %s\n", ASTNode.Token.Text);
 		InnerObserveAST(ASTNode.ChildNodes[1], SpaceCount + 2);
+	}
+	else if (ASTNode.Type == SelectionNode) {
+		printf("Selection Node\n");
+		PrintSpaces(SpaceCount + 2); printf("Condition:\n");
+		InnerObserveAST(ASTNode.ChildNodes[0], SpaceCount + 4);
 	}
 	else if (ASTNode.Type == FunctionNode) {
 		printf("Function Node\n");

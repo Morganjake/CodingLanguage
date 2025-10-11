@@ -8,7 +8,7 @@ enum TokenTypes {
 	FloatToken,
 	StringToken,
 	BooleanToken,
-	KeywordToken,
+	SelectionToken,
 	EndOfLineToken,
 	VariableToken,
 	AssignmentToken,
