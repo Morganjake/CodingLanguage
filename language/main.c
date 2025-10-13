@@ -34,13 +34,11 @@ struct Value RunLine(char* LineChars, struct Variable** Variables, int* Variable
 
 	struct Tokens* Tokens = Tokenize(LineChars);
 	
-	int ASTNodeCount = 0;
+	struct ASTNode AST = CreateAST(Tokens->Tokens, Tokens->TokenCount);
 	
-	struct ASTNode* AST = CreateAST(Tokens->Tokens, Tokens->TokenCount, &ASTNodeCount);
-	
-	ObserveAST(AST, ASTNodeCount);
+	ObserveAST(AST);
 
-	return Parse(LineChars, AST, ASTNodeCount, Variables, VariableCount);
+	return Parse(LineChars, AST, Variables, VariableCount);
 }
 
 void RunProgram() {

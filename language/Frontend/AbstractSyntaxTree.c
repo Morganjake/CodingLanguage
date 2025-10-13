@@ -41,7 +41,6 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 		
 		struct Token Token = Tokens[CurrentToken];
 
-
 		if (Token.TokenType == EndOfLineToken) {
 			return CreateReturnValue(ASTNode, CurrentToken + 1, Priority);
 		}
@@ -206,21 +205,7 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 	return CreateReturnValue(ASTNode, CurrentToken, false);
 }
 
-struct ASTNode* CreateAST(struct Token* Tokens, int TokenCount, int* ASTNodeCount) {
-
-	int CurrentToken = 0;
-	struct ASTNode* AST = malloc(0);
-
-	while (CurrentToken < TokenCount) {
-
-		struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, CurrentToken);
-
-        AST = realloc(AST, ((*ASTNodeCount) + 1) * sizeof(struct ASTNode));
-        AST[*ASTNodeCount] = ReturnValue.ASTNode;
-        (*ASTNodeCount)++;
-
-        CurrentToken = ReturnValue.CurrentToken + 1;
-	}
-
-	return AST;
+struct ASTNode CreateAST(struct Token* Tokens, int TokenCount) {
+	struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, 0);
+	return ReturnValue.ASTNode;
 }

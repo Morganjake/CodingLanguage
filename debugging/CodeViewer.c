@@ -65,8 +65,8 @@ void InnerObserveAST(struct ASTNode ASTNode, int SpaceCount) {
 	}
 }
 
-void ObserveAST(struct ASTNode* AST, int ASTNodeCount) {
+void ObserveAST(struct ASTNode AST) {
 
 	printf("\nLine %d\n", GlobalLineNumber);
-	InnerObserveAST(AST[0], 2);
+	InnerObserveAST(AST, 2);
 }

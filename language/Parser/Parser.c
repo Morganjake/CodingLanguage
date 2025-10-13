@@ -109,10 +109,9 @@ struct Variable ParseLine(struct ASTNode AST, struct Variable** Variables, int* 
     return Variable;
 }
 
-struct Value Parse(char* FileChars, struct ASTNode* AST, int ASTNodeCount,
-    struct Variable** Variables, int* VariableCount) {
+struct Value Parse(char* FileChars, struct ASTNode AST, struct Variable** Variables, int* VariableCount) {
 
-    struct Variable Variable = ParseLine(AST[0], Variables, VariableCount);
+    struct Variable Variable = ParseLine(AST, Variables, VariableCount);
 
     if (Variable.Name != NULL) {
         *Variables = realloc(*Variables, ((*VariableCount) + 1) * sizeof(struct Variable));
