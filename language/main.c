@@ -69,17 +69,19 @@ void RunProgram() {
 	while(fgets(LineBuffer, MaxLineBufferSize, File)) {
 
 		for (int i = 0; i < MaxLineBufferSize; i++) {
+
+			if (LineBuffer[i] == 0) { break; }
+			else if (LineBuffer[i] == 10) { continue; }
 			
 			FileChars = realloc(FileChars, (BufferLocation + 1) * sizeof(char));
-			FileChars[BufferLocation] = LineBuffer[i];
-
 			GlobalLine = realloc(GlobalLine, (BufferLocation + 1) * sizeof(char));
+
+			FileChars[BufferLocation] = LineBuffer[i];
 			GlobalLine[BufferLocation] = LineBuffer[i];
 
 			BufferLocation++;
 
 			if (LineBuffer[i] == 59 || LineBuffer[i] == 123) {
-				printf("'%s'\n", FileChars);
 				struct Value Value = RunLine(FileChars, &Variables, &VariableCount);
 				free(FileChars);
 				free(GlobalLine);
@@ -111,11 +113,10 @@ void RunProgram() {
 
 				FileChars = malloc(0);
 				GlobalLine = malloc(0);
+				i++; // Skips the newline character
 			}
 			
-			if (LineBuffer[i] == 10 || LineBuffer[i] == 0) {
-				break;
-			}
+
 		}
 	}
 
