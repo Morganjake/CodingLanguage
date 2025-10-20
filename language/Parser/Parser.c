@@ -15,16 +15,21 @@ struct Variable {
     struct Value Value;
 };
 
+struct VariableExistsResult {
+    struct Value Value;
+    int Index;
+};
+
 // Gets a variable from the variable list
-struct Value GetVariable(char* Name, struct Variable** Variables, int* VariableCount) {
+struct VariableExistsResult GetVariable(char* Name, struct Variable** Variables, int* VariableCount) {
 
     for (int i = 0; i < *VariableCount; i++) {
         if (strcmp(Name, (*Variables)[i].Name) == 0) {
-            return (*Variables)[i].Value;
+            return (struct VariableExistsResult) {(*Variables)[i].Value, i};
         }
     }
 
-    Error("Variable not initialized");
+    return (struct VariableExistsResult) {(struct Value) {NullType, NULL}, -1};
 }
 
 struct Variable ParseLine(struct ASTNode AST, struct Variable** Variables, int* VariableCount) {
@@ -43,8 +48,13 @@ struct Variable ParseLine(struct ASTNode AST, struct Variable** Variables, int* 
         
         if (AST.Token.TokenType == VariableToken) {
             Variable.Name = AST.Token.Text;
-            struct Value Value = GetVariable(Variable.Name, Variables, VariableCount);
-            Variable.Value = Value;
+            struct VariableExistsResult VarExists = GetVariable(Variable.Name, Variables, VariableCount);
+
+            if (VarExists.Index == -1) {
+                Error("Variable does not exist");
+            }
+
+            Variable.Value = VarExists.Value;
         }
         else {
             // Datatypes in the TokenTypes and DataTypes enums are aligned so this works
@@ -114,9 +124,18 @@ struct Value Parse(char* FileChars, struct ASTNode AST, struct Variable** Variab
     struct Variable Variable = ParseLine(AST, Variables, VariableCount);
 
     if (Variable.Name != NULL) {
-        *Variables = realloc(*Variables, ((*VariableCount) + 1) * sizeof(struct Variable));
-        (*Variables)[*VariableCount] = Variable;
-        *VariableCount += 1;
+
+        struct VariableExistsResult VarExists = GetVariable(Variable.Name, Variables, VariableCount);
+
+        if (VarExists.Index == -1) {
+            *Variables = realloc(*Variables, (*VariableCount + 1) * sizeof(struct Variable));
+            (*Variables)[*VariableCount] = Variable;
+            (*VariableCount)++;
+        }
+        else {
+            (*Variables)[VarExists.Index].Value = Variable.Value;
+        }
+
     }
 
     return Variable.Value;
