@@ -46,7 +46,7 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 		}
 		else if (Token.TokenType == IntegerToken || Token.TokenType == FloatToken || Token.TokenType == StringToken || 
 			Token.TokenType == BooleanToken || Token.TokenType == VariableToken) {
-				
+
 			if (ASTNode.Type != EmptyNode) {
 				Error("Syntax Error");
 			}
@@ -206,6 +206,7 @@ struct ASTNodeReturnValue CreateASTNode(struct Token* Tokens, int TokenCount, in
 }
 
 struct ASTNode CreateAST(struct Token* Tokens, int TokenCount) {
+
 	struct ASTNodeReturnValue ReturnValue = CreateASTNode(Tokens, TokenCount, 0);
 	return ReturnValue.ASTNode;
 }

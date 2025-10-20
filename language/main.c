@@ -32,9 +32,9 @@ double GetTime() {
 
 struct Value RunLine(char* LineChars, struct Variable** Variables, int* VariableCount) {
 
-	struct Tokens* Tokens = Tokenize(LineChars);
+	struct Tokens Tokens = Tokenize(LineChars);
 	
-	struct ASTNode AST = CreateAST(Tokens->Tokens, Tokens->TokenCount);
+	struct ASTNode AST = CreateAST(Tokens.Tokens, Tokens.TokenCount);
 	
 	ObserveAST(AST);
 

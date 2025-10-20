@@ -1,2 +1,3 @@
 a = 3;
-if a == 3 { print("dfgdfg"); }
+b = 3;
+c = 3;

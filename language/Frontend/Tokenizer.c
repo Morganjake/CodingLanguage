@@ -38,7 +38,7 @@ void UpdateTokens(struct Token** TokensPtr, char* TokenBuffer, int* TokenCountPt
 	(*TokenCountPtr)++;
 }
 
-struct Tokens* Tokenize(char* FileChars) {
+struct Tokens Tokenize(char* FileChars) {
 
 	int CharLocation = 0;
 
@@ -168,6 +168,11 @@ struct Tokens* Tokenize(char* FileChars) {
 				case '}': TokenType = BracketToken; TokenBuffer[0] = FileChars[CharLocation]; break;
 				case ',': TokenType = CommaToken;TokenBuffer[0] = FileChars[CharLocation];  break;
 			}
+
+			if (TokenType == EndOfLineToken) {
+				UpdateTokens(&Tokens, TokenBuffer, &TokenCount, &TokenBufferLocation, TokenType);
+				return (struct Tokens) {Tokens, TokenCount};
+			}
 			
 			UpdateTokens(&Tokens, TokenBuffer, &TokenCount, &TokenBufferLocation, TokenType);
 			CharLocation++;
@@ -177,9 +182,5 @@ struct Tokens* Tokenize(char* FileChars) {
 		}
 	}
 
-	struct Tokens* TokensStruct = malloc(sizeof(struct Tokens));
-	TokensStruct->Tokens = Tokens;
-	TokensStruct->TokenCount = TokenCount;
-
-	return TokensStruct;
+	return (struct Tokens) {Tokens, TokenCount};
 }
